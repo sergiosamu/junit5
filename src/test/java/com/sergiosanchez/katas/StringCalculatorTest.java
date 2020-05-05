@@ -1,6 +1,9 @@
 package com.sergiosanchez.katas;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.security.InvalidParameterException;
 
 import com.sergiosanchez.katas.tdd.StringCalculator;
 
@@ -44,7 +47,16 @@ public class StringCalculatorTest {
     @DisplayName("Define delimiter")
     @Test
     public void dynamicDelimiter() {
-        assertEquals(6,target.add("//;1;2,3"));
+        assertEquals(6,target.add("//;1;2;3"));
+    }     
+
+    @DisplayName("Detect negative")
+    @Test
+    public void detectNegative() {
+        Exception exception = assertThrows(InvalidParameterException.class,
+                () -> target.add("2,-1"));
+        
+        assertEquals("negatives not allowed -1",exception.getMessage());
     }     
     
 }

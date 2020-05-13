@@ -68,11 +68,20 @@ public class StringCalculatorTest {
         assertEquals("negatives not allowed -1, -2",exception.getMessage());
     }         
 
+    @DisplayName("Detect multi execution count")
+    @Test
+    public void getZeroExecutionCount() {
+        target.add("2,4");
+        target.add("2,5");
+        assertEquals(2, target.getCalledCount());
+    }         
+
     @DisplayName("Detect execution count")
     @Test
-    public void getExecutionCount() {
+    public void getMultiExecutionCount() {
+
         assertEquals(0, target.getCalledCount());
-    }         
+    }     
 
     @DisplayName("Ignore big numbers")
     @Test

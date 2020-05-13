@@ -50,7 +50,7 @@ public class StringCalculatorTest {
         assertEquals(6,target.add("//;1;2;3"));
     }     
 
-    @DisplayName("Detect negative")
+    @DisplayName("Detect one negative")
     @Test
     public void detectNegative() {
         Exception exception = assertThrows(InvalidParameterException.class,
@@ -58,5 +58,44 @@ public class StringCalculatorTest {
         
         assertEquals("negatives not allowed -1",exception.getMessage());
     }     
+
+    @DisplayName("Detect multiple negative")
+    @Test
+    public void detectMultipleNegative() {
+        Exception exception = assertThrows(InvalidParameterException.class,
+                () -> target.add("2,-1,4,-2"));
+        
+        assertEquals("negatives not allowed -1, -2",exception.getMessage());
+    }         
+
+    @DisplayName("Detect execution count")
+    @Test
+    public void getExecutionCount() {
+        assertEquals(0, target.getCalledCount());
+    }         
+
+    @DisplayName("Ignore big numbers")
+    @Test
+    public void discardBigNumbers() {
+        assertEquals(5, target.add("2,1001,3"));
+    }    
+
+    @DisplayName("Multi-char delimiter")
+    @Test
+    public void multicharDelimiter() {
+        assertEquals(6, target.add("//[***]\n1***2***3"));
+    }
+
+    @DisplayName("Multiple single-char delimiter")
+    @Test
+    public void multipleSingleCharDelimiter() {
+        assertEquals(6, target.add("//[*][%]\n1*2%3"));
+    }
+
+    @DisplayName("Multiple multi-char delimiter")
+    @Test
+    public void multipleMultiCharDelimiter() {
+        assertEquals(6, target.add("//[**][%%]\n1**2%%3"));
+    }    
     
 }

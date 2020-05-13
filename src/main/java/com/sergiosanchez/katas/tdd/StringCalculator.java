@@ -1,12 +1,15 @@
 package com.sergiosanchez.katas.tdd;
 
 import java.security.InvalidParameterException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class StringCalculator {
 
+    private static final int MAX_SUM_NUMBER= 1000;
     private static final String DEFAULT_SEPARATOR=",";
     
     public int add(String numbers) {
@@ -14,29 +17,48 @@ public class StringCalculator {
         if (numbers.equals("")) {
             return 0;
         } else {
-            String separator = DEFAULT_SEPARATOR;
-            if (value.startsWith("//")) {
-                separator=value.substring(2,3);
+            String[] separatorList= new String[] {DEFAULT_SEPARATOR};
+            if (value.startsWith("//[")) {
+                int separatorEndIndex = value.lastIndexOf("]");
+                separatorList = value.substring(3,separatorEndIndex).split(Pattern.quote("]["));
+                value=value.trim().substring(separatorEndIndex + 1);
+            } else if (value.startsWith("//")) {
+                separatorList[0] = value.substring(2,3);
                 value=value.substring(3);
-            }
-            value=value.replace("\n", separator);
-            if (value.indexOf(separator)>-1) {
-                List<Integer> numberList = Arrays.stream(value.split(separator))
-                                                .filter(n -> !n.equals(""))
-                                                .map(n -> Integer.valueOf(n))
-                                                .collect(Collectors.toList());
-                int sum = 0;
-                for (Integer n : numberList) {
-                    if (n<0) {
-                        throw new InvalidParameterException( "negatives not allowed " + n);
-                    };
+            } 
+
+            value=value.replace("\n", separatorList[0]);
+
+            String separatorPattern = Arrays.stream(separatorList)
+                                                    .map(s -> Pattern.quote(s))
+                                                    .collect(Collectors.joining("|"));
+            
+            List<Integer> numberList = Arrays.stream(value.split(separatorPattern))
+                                            .filter(n -> !n.equals(""))
+                                            .map(n -> Integer.valueOf(n))
+                                            .collect(Collectors.toList());
+            int sum = 0;
+            List<Integer> negativesList = new ArrayList<Integer>();
+            for (Integer n : numberList) {
+                if (n<0) {
+                    negativesList.add(n);
+                } 
+                if (n <= MAX_SUM_NUMBER) {
                     sum+=n;
                 }
-                return sum;
+            }
 
+            if (negativesList.isEmpty()) {
+                return sum;
             } else {
-                return Integer.parseInt(value);
+                throw new InvalidParameterException("negatives not allowed " + negativesList.stream()
+                                                                                    .map(Object::toString)
+                                                                                    .collect(Collectors.joining(", ")));
             }
         }
+    }
+
+    public int getCalledCount() {
+        return 0;
     }
 }
